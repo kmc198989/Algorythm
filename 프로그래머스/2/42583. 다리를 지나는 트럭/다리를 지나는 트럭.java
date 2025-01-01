@@ -1,57 +1,35 @@
 import java.util.*;
 
 class Solution {
-    class Truck {
-        int weight;
-        int move;
-
-        public Truck(int weight) {
-            this.weight = weight;
-            this.move = 1;
+    public int solution(int bridge_length, int maxWeight, int[] truck_weights) {
+        Queue<Integer> waitingQueue = new LinkedList<>();
+        Queue<Integer> onBridgeQueue = new LinkedList<>();
+        
+        for (int truckWeight : truck_weights) {
+            waitingQueue.add(truckWeight);
         }
-
-        public void moving() {
-            move++;
+        
+        for (int i = 0; i < bridge_length; i++) {
+            onBridgeQueue.add(0);
         }
-    }
-
-    public int solution(int bridgeLength, int weight, int[] truckWeights) {
-        Queue<Truck> waitQ = new LinkedList<>();
-        Queue<Truck> moveQ = new LinkedList<>();
-
-        for (int t : truckWeights) {
-            waitQ.offer(new Truck(t));
-        }
-
-        int answer = 0;
-        int curWeight = 0;
-
-        while (!waitQ.isEmpty() || !moveQ.isEmpty()) {
-            answer++;
-
-            if (moveQ.isEmpty()) {
-                Truck t = waitQ.poll();
-                curWeight += t.weight;
-                moveQ.offer(t);
-                continue;
-            }
-
-            for (Truck t : moveQ) {
-                t.moving();
-            }
-
-            if (moveQ.peek().move > bridgeLength) {
-                Truck t = moveQ.poll();
-                curWeight -= t.weight;
-            }
-
-            if (!waitQ.isEmpty() && curWeight + waitQ.peek().weight <= weight) {
-                Truck t = waitQ.poll();
-                curWeight += t.weight;
-                moveQ.offer(t);
+        
+        int time = 0;
+        int currentWeightOnBridge = 0;
+        
+        while (!waitingQueue.isEmpty()) {
+            time++;
+            
+            currentWeightOnBridge -= onBridgeQueue.poll();
+            
+            if (!waitingQueue.isEmpty() && currentWeightOnBridge + waitingQueue.peek() <= maxWeight) {
+                int truck = waitingQueue.poll();
+                currentWeightOnBridge += truck;
+                onBridgeQueue.add(truck);
+            } else {
+                onBridgeQueue.add(0);
             }
         }
-
-        return answer;
+        
+        return time + bridge_length;
     }
 }
