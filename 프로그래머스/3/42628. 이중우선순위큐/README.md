@@ -1,10 +1,10 @@
 # [level 3] 이중우선순위큐 - 42628 
 
-[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/42628) 
+[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/42628?language=go) 
 
 ### 성능 요약
 
-메모리: 128 MB, 시간: 74.31 ms
+메모리: 15.3 MB, 시간: 32.68 ms
 
 ### 구분
 
@@ -16,7 +16,7 @@
 
 ### 제출 일자
 
-2025년 01월 10일 16:24:18
+2025년 01월 10일 20:36:22
 
 ### 문제 설명
 
