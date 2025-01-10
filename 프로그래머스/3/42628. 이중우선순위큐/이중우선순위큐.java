@@ -2,39 +2,25 @@ import java.util.*;
 
 class Solution {
     public int[] solution(String[] operations) {
-        int[] answer = new int[2];
-        PriorityQueue<Integer> pqmin = new PriorityQueue<>(); // 최소 힙
-        PriorityQueue<Integer> pqmax = new PriorityQueue<>(Collections.reverseOrder()); // 최대 힙
-        
-        for (String operation : operations) {
-            String[] oper = operation.split(" ");
-            String order = oper[0];
-            int num = Integer.parseInt(oper[1]);
-            
-            if (order.equals("I")) {
-                pqmin.add(num);
-                pqmax.add(num);
-                continue;
-            }  
+        Queue<Integer> minpq = new PriorityQueue<>();
+        Queue<Integer> maxpq = new PriorityQueue<>(Collections.reverseOrder());
 
-            if (pqmin.isEmpty()) {
-                pqmin.clear();
-                pqmax.clear();
-            }
-            if (num == -1) {
-                pqmax.remove(pqmin.poll());
-                continue;
-            }
-            
-            if (num == 1) {
-                pqmin.remove(pqmax.poll());
-                continue;
+        for (String operation : operations) {
+            if (operation.startsWith("I ")) {
+                int n = Integer.parseInt(operation.substring(2));
+                minpq.offer(n);
+                maxpq.offer(n);
+            } else if (!minpq.isEmpty() && operation.equals("D -1")) {
+                maxpq.remove(minpq.poll());
+            } else if (!maxpq.isEmpty() && operation.equals("D 1")) {
+                minpq.remove(maxpq.poll());
             }
         }
-        
-        answer[0] = pqmax.isEmpty() ? 0 : pqmax.peek();
-        answer[1] = pqmin.isEmpty() ? 0 : pqmin.peek();
-        
-        return answer;
+
+        if (minpq.isEmpty() && maxpq.isEmpty()) {
+            return new int[]{0, 0};
+        }
+
+        return new int[]{maxpq.poll(), minpq.poll()};
     }
 }
