@@ -1,36 +1,48 @@
+import java.util.*;
+
 class Solution {
     public int solution(String begin, String target, String[] words) {
         int answer = 0;
-        int length = words.length;
-        boolean[] visited = new boolean[length];
-        answer = dfs (begin, target, words, visited, 0, 0, length);
+        Queue<Word> que = new LinkedList<>();
+        boolean[] visited = new boolean[words.length];
+        Word start = new Word(begin, 0);
+        que.add(start);
+        
+        while(!que.isEmpty()) {
+            Word cur = que.poll();
+            String curword = cur.word;
+            int curcount = cur.count;
+            if (curword.equals(target)) return curcount;
+            
+            for (int i = 0; i < words.length; i++) {
+                String nextword = words[i];
+                if (!visited[i] && canChange(curword, nextword)) {
+                    Word next = new Word(nextword, curcount + 1);
+                    que.add(next);
+                    visited[i] = true;
+                }
+            }
+        }        
+        
         return answer;
     }
     
-    private int dfs (String cur, String target, String[] words, boolean[] visited, int idx, int count, int length) {
-        if (cur.equals(target)) return count;
-        System.out.println("dfs");
-        int result = 0;
-        
-        for (int i = 0; i < length; i++) {
-            if (visited[i]) continue;
-            String word = words[i];
-            if (canChange(word, cur)) {
-                visited[i] = true;
-                result = dfs (word, target, words, visited, i, count + 1, length);
-                visited[i] = false;
-            }
+    private boolean canChange(String cur, String next) {
+        int count = 0;
+        for (int i = 0; i < cur.length(); i++) {
+            if (cur.charAt(i) != next.charAt(i)) count++;
         }
-        
-        return result;
+        if (count == 1) return true;
+        return false;
     }
     
-    private boolean canChange (String word, String cur) {
-        int count = 0;
-        for (int i = 0; i < word.length(); i++) {
-            if (word.charAt(i) == cur.charAt(i)) count++;
+    
+    public class Word {
+        String word;
+        int count;
+        Word(String word, int count) {
+            this.word = word;
+            this.count = count;
         }
-        if (count == word.length() - 1) return true;
-        return false;
     }
 }
