@@ -2,35 +2,61 @@ import java.util.*;
 
 class Solution {
     public int[] solution(String[] genres, int[] plays) {
-        // 1. 장르별 총 재생 횟수 계산
-        Map<String, Integer> genreTotalPlays = new HashMap<>();
-        Map<String, List<int[]>> genreSongs = new HashMap<>();
-
-        for (int i = 0; i < genres.length; i++) {
-            String genre = genres[i];
+        int[] answer = {};
+        int len = genres.length;
+        Map<String, Integer> playmap = new HashMap<>();
+        Map<String, PriorityQueue<Song>> genremap = new HashMap<>();
+        
+        for (int i = 0; i < len; i++) {
+            String gen = genres[i];
             int play = plays[i];
-            genreTotalPlays.put(genre, genreTotalPlays.getOrDefault(genre, 0) + play);
-
-            genreSongs.computeIfAbsent(genre, k -> new ArrayList<>()).add(new int[]{i, play});
+            playmap.put(gen, playmap.getOrDefault(gen, 0) + play);
+            genremap.computeIfAbsent(gen, k -> new PriorityQueue<>((a, b) -> {
+                if (a.play != b.play) return b.play - a.play;
+                return a.idx - b.idx;
+            })).add(new Song(play, i));
         }
-
-        // 2. 장르별 총 재생 횟수로 정렬
-        List<String> sortedGenres = new ArrayList<>(genreTotalPlays.keySet());
-        sortedGenres.sort((a, b) -> genreTotalPlays.get(b) - genreTotalPlays.get(a));
-
-        // 3. 각 장르별로 노래 정렬 (재생 횟수 내림차순, 고유 번호 오름차순)
+        
+        PriorityQueue<Genre> pq = new PriorityQueue<>((a, b) -> b.play - a.play);
+        
+        for (Map.Entry<String, Integer> entry : playmap.entrySet()) {
+            pq.add(new Genre(entry.getValue(), entry.getKey()));
+        }
+        
         List<Integer> result = new ArrayList<>();
-        for (String genre : sortedGenres) {
-            List<int[]> songs = genreSongs.get(genre);
-            songs.sort((a, b) -> b[1] == a[1] ? a[0] - b[0] : b[1] - a[1]);
 
-            // 최대 2곡 선택
-            for (int i = 0; i < Math.min(2, songs.size()); i++) {
-                result.add(songs.get(i)[0]);
+        while (!pq.isEmpty()) {
+            String genre = pq.poll().name;
+            PriorityQueue<Song> songs = genremap.get(genre);
+            int length = Math.min(2, songs.size());
+            for (int i = 0; i < length; i++) {
+                result.add(songs.poll().idx);
             }
+        }        
+        answer = new int[result.size()];
+        
+        for (int i = 0; i < answer.length; i++) {
+            answer[i] = result.get(i);
         }
-
-        // 결과 리스트를 배열로 변환
-        return result.stream().mapToInt(i -> i).toArray();
+        
+        return answer;
+    }
+    
+    class Song {
+        int play;
+        int idx;
+        Song(int play, int idx) {
+            this.play = play;
+            this.idx = idx;
+        }
+    }
+    
+    class Genre {
+        int play;
+        String name;
+        Genre(int play, String name) {
+            this.play = play;
+            this.name = name;
+        }
     }
 }
