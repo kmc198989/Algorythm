@@ -2,48 +2,48 @@ import java.util.*;
 
 class Solution {
     public int solution(int n, int[][] edge) {
-        List<List<Integer>> graph = new ArrayList<>();
-        
-        for (int i = 0; i < n+1; i++) {
-            graph.add(new ArrayList<>());
+        int answer = 0;
+        boolean[] visited = new boolean[n + 1];
+        List<Set<Integer>> edges = new ArrayList<>();
+        for (int i = 0; i <= n; i++) {
+            edges.add(new HashSet<>());
         }
         
-        for (int [] con : edge) {
-            graph.get(con[0]).add(con[1]);
-            graph.get(con[1]).add(con[0]);
-        }        
         
-        return bfs(graph, n, 1);
+        for (int[] e : edge) {
+            edges.get(e[0]).add(e[1]);
+            edges.get(e[1]).add(e[0]);
+        }
+        
+        answer = bfs(edges, visited, 1);
+        
+        return answer;
     }
-    public int bfs(List<List<Integer>> graph, int n, int start) {
-        boolean[] visited = new boolean[n+1];
-        int[] distance = new int[n+1];
+    
+    private int bfs(List<Set<Integer>> edges, boolean[] visited, int start) {
         
-        Queue<Integer> que = new LinkedList<>();
-        que.offer(start);
-        visited[start] = true;
-        while (!que.isEmpty()) {
-            int cur = que.poll();
-            List<Integer> curlist = graph.get(cur);
-            
-            for (int next : curlist) {
-                if (!visited[next]) {
-                    visited[next] = true;
-                    distance[next] = distance[cur] + 1;
-                    que.offer(next);
-                }
-            }            
-        }
-        
+        Queue<int[]> q = new LinkedList<>();
+        q.add(new int[]{1, 1});
+        visited[1] = true;
+        int[] len = new int[edges.size() + 1];
+        len[1]++;
         int max = 0;
-        for (int d : distance) {
-            max = Math.max(max, d);
-        }
-        int count = 0;
-        for (int d : distance) {
-            if (d == max) count++;
+        
+        while (!q.isEmpty()) {
+            int[] cur = q.poll();
+            
+            for (int node : edges.get(cur[0])) {
+                if (!visited[node]) {
+                    visited[node] = true;
+                    int far = cur[1] + 1;
+                    q.add(new int[] {node, far});
+                    len[far]++;
+                    max = Math.max(max, far);
+                }
+            }
         }
         
-        return count;
+        return len[max];
+        
     }
 }
